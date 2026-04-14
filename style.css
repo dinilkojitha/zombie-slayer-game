@@ -1,0 +1,30 @@
+.bg{
+    position: absolute;
+    background-image: url("assets/Background.jpg");
+    background-size: 100%;
+}
+
+.timer{
+    position: absolute;
+    align-content: center;
+    font-size: 40px;
+    margin-left: 700px;
+    font-weight: bold;
+}
+
+.hero{
+    position: absolute;
+    height: 250px;
+    margin-top: 470px;
+    margin-left:50px;
+    transform: scalex(+1);
+}
+
+.zombie{
+    position:absolute;
+    height: 250px;
+    margin-top: 470px;
+    margin-left: 1270px;
+    transform: scalex(-1);
+    
+}
