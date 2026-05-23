@@ -1,89 +1,95 @@
-var startValue = 0;
+var isStart = false;
+var isForward = false;
+var isBackward = false;
 
 function start(event){
     
-
-    if (event.key == "Enter" && startValue == false){
-        startValue = true;
-        timer();            
+    
+    if (event.key === "Enter" && isStart === false){
+        isStart = true;
+        timer();    
+        clearInterval(zombieIdleWorker);
+        walkAnimation();       
     }
 
+    if (event.key === "d" && isStart === true && isForward === false){
+        isForward = true;
+        isBackward = false;
+        heroScale = +1;
+        clearInterval(heroIdleWorker);
+        clearInterval(RunWorker);
+        heroRun();
+    }
     
-    if (event.key == "d"){
+    if (event.key === "a" && isStart === true && isBackward === false){
+        isBackward = true;
+        isForward = false;
+        heroScale = -1;
+        clearInterval(heroIdleWorker);
+        clearInterval(RunWorker);
+        heroRun();
+
+    }
+    
+    if (event.key === " " && isStart === true){
         
     }
-    
-    if (event.key == "a"){
-        
-    }
-    
-    if (event.key == " "){
-        
-    }
-
-    // if (heroML <= zombieML + 100 && heroML >=zombieML - 100 && zombieAttackWorker == 0 && startValue == 1){
-    //     clearInterval(walkWorker);
-    //     zombieAttack();
-    // }
-
-    // if(heroML >= zombieML + 100 && heroML <=zombieML - 100){
-    //     walkWorker = 0;
-    //     clearInterval(zombieAttackWorker);
-    //     walk();
-    // }
-
-
 }
 
+var timeWorker = false;
 var remainTime = 50;
-var timeWorker ;
+
 function timer(){
+    console.log("timeWorker working");
     timeWorker = setInterval(()=>{
+        if(remainTime !== 0){
+            document.getElementById("timer").innerHTML = `Time:${--remainTime}`;
+        }
 
-        document.getElementById("timer").innerHTML = `Time:${--remainTime}`;
-
-        if(remainTime == 0){
-            alert("Game Over");
-            window.location.reload();
+        if(remainTime === 0){
+            document.getElementById("gameOver").style.display = "block";
+            // window.location.reload();
         }
     },1000)
 }
 
 var heroIdleImageNumber = 0;
-var heroIdleWorker = 0;
+var heroIdleWorker = false;
 function heroIdleAnimation(){
 
     heroIdleWorker = setInterval(()=>{
         
         document.getElementById("hero").src = `assets/hero/Idle (${++heroIdleImageNumber}).png`;
 
-        if (heroIdleImageNumber == 10){
+        if (heroIdleImageNumber === 10){
             heroIdleImageNumber = 1;
         }
     }, 100)  
 }    
 
 var runImage = 0;
-var heroML = 50;
-var heroScale = +1;
-var forwardRunWorker = 0;
+var heroML = 60;
+var heroScale;
+var RunWorker = false;
+var forRunner = false;
+var backRunner = false;
 
-function run(){
+function heroRun(){
 
-    forwardRunWorker = setInterval(()=>{
-
-        if (heroML < 100 && key == "d"){
-            heroML = heroML + 1;
-            document.getElementById("hero").style.marginLeft = `${heroML}px`;
+    RunWorker = setInterval(()=>{
+        if (heroML <= 95 && heroML > 0 && heroScale === -1){
+            heroML = heroML - 0.5;
+            // document.getElementById("hero").style.left = `${heroML}%`;
         }
-        else if (heroML > 0 && key == "a"){
-            heroML = heroML + 1;
-            document.getElementById("hero").style.marginLeft = `${heroML}px`;
+        else if (heroML < 95 && heroML >= 0 && heroScale === +1){
+            heroML = heroML + 0.5;
+            // document.getElementById("hero").style.left = `${heroML}%`;
         }
+        document.getElementById("hero").style.left = `${heroML}%`;
 
-        document.getElementById("hero").src = `assets/hero/Run (${++runImage} + ).png`;
-
-        if (runImage == 10){
+        document.getElementById("hero").src = `assets/hero/Run (${++runImage}).png`;
+        document.getElementById("hero").style.transform = `scaleX(${heroScale})`;
+        if (runImage === 10){
             runImage = 1;
         }
 
@@ -141,31 +147,30 @@ function run(){
 // }
 
 var heroAttackImageNumber = 0;
-var heroAttackWorker = 0;
+var heroAttackWorker = false;
 var attackCount = 0;
 
 function heroAttack(){
 
     heroAttackWorker = setInterval(()=>{
 
-        heroAttackImageNumber++;
-
-        if (heroAttackImageNumber == 10){
+        if (heroAttackImageNumber === 10){
             heroAttackImageNumber = 1;
+            heroAttackWorker = false;
+            clearInterval(heroAttackWorker)
+        }
 
-            if (zombieML + 3 >= heroML && heroML >= zombieML - 3){
-                attackCount++;
-            }
-
+        if (zombieML + 3 >= heroML && heroML >= zombieML - 3){
+            attackCount++;
         }
         
         document.getElementById("hero").src = `assets/hero/Attack (${++heroAttackImageNumber}).png`;
-                
+        document.getElementById("hero").style.transform = `scaleX(${heroScale})`;
     }, 80)
 }
 
 var zombieIdleImageNumber = 0;
-var zombieIdleWorker = 0;
+var zombieIdleWorker = false;
 
 function zombieIdleAnimation(){
 
@@ -173,90 +178,107 @@ function zombieIdleAnimation(){
 
         document.getElementById("zombie").src = `assets/femaleZombie/Idle (${++zombieIdleImageNumber}).png`;
 
-        if (zombieIdleImageNumber == 15){
+        if (zombieIdleImageNumber === 15){
             zombieIdleImageNumber = 1;
         }    
     }, 100);
 }
 
-var zombieWalkImageNumber = 0;
+var zombieWalkImageNumber = 1;
 var zombieML = 90;
 var zombieScale = -1;
-var walkWorker  = 0;
+var walkWorker  = false;
 
 function walkAnimation(){
 
     walkWorker = setInterval(()=>{
-        
-        document.getElementById("zombie").src = `assets/femaleZombie/Walk (${++zombieWalkImageNumber}).png`;
 
-        if (zombieWalkImageNumber == 10){
+        if (zombieWalkImageNumber === 10){
             zombieWalkImageNumber = 1;
         }
+        if(zombieML <= 96 && zombieML >= 0){
+            zombieWalkPosition();
+        }
+        if (heroML - 4 <= zombieML && heroML + 4 >= zombieML ){
+            console.log("HI")
+            clearInterval(walkWorker);
+            zombieAttack();
+        }
 
-        zombieWalkPosition();
+        if(zombieML > heroML){
+            zombieScale = -1
+        }
+        else{
+            zombieScale = +1
+        }
 
-        document.getElementById("zombie").style.marginLeft = `${zombieML}px`;
+        document.getElementById("zombie").src = `assets/femaleZombie/Walk (${zombieWalkImageNumber++}).png`;
+        document.getElementById("zombie").style.transform = `scaleX(${zombieScale})`;
 
     },120)
 }
 
 function zombieWalkPosition(){
-    if (zombieML > heroML + 50 && zombieAttackWorker == 0){
+    zombieAttackWorker = false
+
+    if (zombieML > heroML && zombieML > 0 ){
 
         zombieScale = -1;
-        zombieML = zombieML - 5;
+        zombieML = zombieML - 0.3;
 
-        document.getElementById("zombie").style.transform = `scalex(${zombieScale-=5})`;
+        document.getElementById("zombie").style.transform = `scalex(${zombieScale})`;
+        document.getElementById("zombie").style.left = `${zombieML}%`;
     }
 
-    if (zombieML < heroML - 50 && zombieAttackWorker == 0){
+    if (zombieML < heroML &&  zombieML < 96 ){
 
         zombieScale = +1;
-        zombieML = zombieML + 5;
+        zombieML = zombieML + 0.3;
         
-        document.getElementById("zombie").style.transform = `scalex(${zombieScale+=5})`;   
+        document.getElementById("zombie").style.transform = `scalex(${zombieScale})`;
+        document.getElementById("zombie").style.left = `${zombieML}%`;
     }
-
 }
 
 var zombieAttackImageNumber = 0;
-var zombieAttackWorker = 0;
+var zombieAttackWorker = false;
 
 function zombieAttack(){
 
     zombieAttackWorker = setInterval(()=>{
 
-        if (zombieML <= heroML && walkWorker == 0 ){
+        if(heroML - 6 > zombieML || heroML + 6 < zombieML){
+            clearInterval(zombieAttackWorker)
+            walkAnimation();
+        }
+
+        if (zombieML <= heroML && walkWorker === false ){
             zombieScale = +1;
             document.getElementById("zombie").style.transform = `scalex(${zombieScale})`;
         }
-
-        if (zombieML >= heroML && walkWorker == 0){
+        else if (zombieML >= heroML && walkWorker === false){
             zombieScale = -1;
             document.getElementById("zombie").style.transform = `scalex(${zombieScale})`;
         }
 
         document.getElementById("zombie").src = `assets/femaleZombie/Attack (${++zombieAttackImageNumber}).png`; 
 
-
-        if (zombieAttackImageNumber == 8){
+        if (zombieAttackImageNumber === 8){
             zombieAttackImageNumber = 1;
         }
     }, 120)
 }
 
 var zombieDeadImageNumber = 0;
-var zombieDeadWorker = 0; 
+var zombieDeadWorker = false;
 
 function zombieDead(){
-    zombieActivityNumber = 4;
 
     zombieDeadWorker = setInterval(()=>{
 
         document.getElementById("zombie").src = `assets/femaleZombie/Dead (${++zombieDeadImageNumber}).png`;
 
-        if (zombieDeadImageNumber == 12){
+        if (zombieDeadImageNumber === 12){
             clearInterval(zombieDeadWorker);
             alert("you Won");
         }

@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="style.css">
     </head>
 
-    <body onkeyup="start(event)" onload="heroIdleAnimation() + zombieIdleAnimation()">
+    <body onkeyup="start(event)" onload="heroIdleAnimation(); zombieIdleAnimation()">
         
         <img class="bg"src="assets/Background.jpg" alt="">
 
@@ -13,7 +13,13 @@
 
         <img class="zombie" id="zombie" src="assets/femaleZombie/Idle (1).png">
         <img class="hero"   id="hero"   src="assets/hero/Idle (1).png">
-            
+
+
+        <div id="gameOver" class="game-over-screen">
+            <h1>You were eaten!</h1>
+            <p>Press F5 to restart</p>
+        </div>
+
         <script src="script.js"></script>
     </body>
 </html>
